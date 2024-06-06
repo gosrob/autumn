@@ -1,0 +1,19 @@
+
+architecture {
+  initPrepare
+  collectNode
+  parseBeanDefinition
+  RegisterBeanDefinition
+  prepareBeanFactory
+  BeginToCreateBeans
+  AutowireAttributesInjectValue
+  Aop
+
+  initPrepare -> collectNode
+  collectNode -> parseBeanDefinition
+  parseBeanDefinition -> RegisterBeanDefinition
+  RegisterBeanDefinition -> prepareBeanFactory
+  prepareBeanFactory -> BeginToCreateBeans
+  BeginToCreateBeans -> AutowireAttributesInjectValue
+  AutowireAttributesInjectValue -> Aop
+}
