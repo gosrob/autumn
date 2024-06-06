@@ -55,12 +55,10 @@ func (l *mLogger) SetIsDebug(debug bool) {
 
 func (l *mLogger) Info(args ...interface{}) {
 	l.logger.Info(args...)
-	l.printCallerCode(log.InfoLevel)
 }
 
 func (l *mLogger) Infof(format string, args ...interface{}) {
 	l.logger.Infof(format, args...)
-	l.printCallerCode(log.InfoLevel)
 }
 
 func (l *mLogger) Error(args ...interface{}) {
@@ -78,7 +76,6 @@ func (l *mLogger) Debug(args ...interface{}) {
 		return
 	}
 	l.logger.Debug(args...)
-	l.printCallerCode(log.DebugLevel)
 }
 
 func (l *mLogger) Debugf(format string, args ...interface{}) {
@@ -86,7 +83,6 @@ func (l *mLogger) Debugf(format string, args ...interface{}) {
 		return
 	}
 	l.logger.Debugf(format, args...)
-	l.printCallerCode(log.DebugLevel)
 }
 
 func (l *mLogger) Warn(args ...interface{}) {
@@ -199,6 +195,7 @@ func (l *mLogger) CatchPanic() {
 		}
 		fmt.Fprintln(buf, "------------------------------------------")
 		l.logger.Error(buf.String())
+		l.printCallerCode(log.FatalLevel)
 	}
 }
 

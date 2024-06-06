@@ -10,10 +10,7 @@ require (
 
 require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
-	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 )
