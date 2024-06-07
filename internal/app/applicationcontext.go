@@ -27,6 +27,8 @@ func (a *ApplicationContext) Run() map[string][]byte {
 
 	// TODO: run to here all beans and all attributes are set.  then register this to sambar/do container, which is a generic type container
 	a.Inject()
+
+	// Future TODO: in future canbe  cp all files to ./tmp directory, after that we can rewrite Struct to Struct_base, and our Struct Proxy canbe Struct, so code in our project do not need to change type from struct to structProxy
 	return nil
 }
 
