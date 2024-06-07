@@ -1,9 +1,13 @@
 package app
 
+type AnnotationList []any
+
 // # represents a struct
 //
 // this struct contains struct field
 type StructDefinition struct {
+	Annotations AnnotationList
+
 	Name string
 
 	// struct field
@@ -21,6 +25,8 @@ type Field struct {
 	//
 	// if field type is basic type, it just act like a normal type.
 	Type string
+
+	Annotations AnnotationList
 }
 
 // FuncDefinition represents the structure of a function definition, including its name,
@@ -29,6 +35,8 @@ type FuncDefinition struct {
 	Name    string  // Name is the name of the function.
 	Params  []Param // Params is a slice of parameters the function accepts.
 	Results []Param // Results is a slice of parameters the function returns.
+
+	Annotations AnnotationList
 }
 
 // Param represents a parameter within a function definition.

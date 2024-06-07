@@ -195,7 +195,7 @@ func (l *mLogger) CatchPanic() {
 		}
 		fmt.Fprintln(buf, "------------------------------------------")
 		l.logger.Error(buf.String())
-		l.printCallerCode(log.FatalLevel)
+		// l.printCallerCode(log.FatalLevel)
 	}
 }
 
