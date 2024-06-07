@@ -24,6 +24,8 @@ type BeanDefinition struct {
 	// TODO: Currently, this field is not used.
 	IsLazy bool
 
+	Alias string
+
 	// Consturcts is a map where each key is a string representing the name of a bean,
 	// and each value is a Constructor function that creates an instance of that bean.
 	// TODO: Currently, this field is not used.

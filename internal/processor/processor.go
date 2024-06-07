@@ -1,9 +1,12 @@
 package processor
 
 import (
+	"go/ast"
+
 	annotation "github.com/YReshetko/go-annotation/pkg"
 	. "github.com/gosrob/autumn/internal/app"
 	. "github.com/gosrob/autumn/internal/logger"
+	"github.com/gosrob/autumn/internal/util/astutil"
 )
 
 type processor struct{}
@@ -22,13 +25,24 @@ func (p *processor) Output() map[string][]byte {
 
 // Process implements annotation.AnnotationProcessor.
 func (p *processor) Process(node annotation.Node) error {
-	bd, err := ApplicationContexter.ReadBeanDefinition(node)
-	if err != nil {
-		Logger.Warnf("failed parse beanDefinition, %+v", node)
-		return err
+	if _, error := astutil.AstCast[*ast.StructType](node.ASTNode()); error == nil {
+		bd, err := ApplicationContexter.ReadBeanDefinition(node)
+		if err != nil {
+			Logger.Warnf("failed parse beanDefinition, %+v", node)
+			return err
+		}
+		ApplicationContexter.RegisterBeanDefinition(bd)
 	}
-	ApplicationContexter.RegisterBeanDefinition(bd)
-	// TODO: register factory func
+
+	if _, error := astutil.AstCast[*ast.FuncType](node.ASTNode()); error == nil {
+		fd, err := ApplicationContexter.ReadBeanFactoryDefinition(node)
+		if err != nil {
+			Logger.Warnf("failed parse beanDefinition, %+v", node)
+			return err
+		}
+		ApplicationContexter.RegisterBeanFactoryDefinition(fd)
+	}
+
 	return nil
 }
 
