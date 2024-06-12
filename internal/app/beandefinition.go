@@ -37,4 +37,8 @@ type BeanDefinition struct {
 type Constructor struct {
 	ConstructBeanName string
 	ConstructorFn     func() string
+	ConstructorParam  []Param
+	ConstructorResult []Param
+
+	BeanIndex int
 }

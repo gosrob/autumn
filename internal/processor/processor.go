@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"context"
 	"go/ast"
 
 	annotation "github.com/YReshetko/go-annotation/pkg"
@@ -20,12 +21,12 @@ func (p *processor) Name() string {
 
 // Output implements annotation.AnnotationProcessor.
 func (p *processor) Output() map[string][]byte {
-	return ApplicationContexter.Run()
+	return ApplicationContexter.Run(context.Background())
 }
 
 // Process implements annotation.AnnotationProcessor.
 func (p *processor) Process(node annotation.Node) error {
-	if _, error := astutil.AstCast[*ast.StructType](node.ASTNode()); error == nil {
+	if _, error := astutil.AstCast[*ast.TypeSpec](node.ASTNode()); error == nil {
 		bd, err := ApplicationContexter.ReadBeanDefinition(node)
 		if err != nil {
 			Logger.Warnf("failed parse beanDefinition, %+v", node)
@@ -34,7 +35,7 @@ func (p *processor) Process(node annotation.Node) error {
 		ApplicationContexter.RegisterBeanDefinition(bd)
 	}
 
-	if _, error := astutil.AstCast[*ast.FuncType](node.ASTNode()); error == nil {
+	if _, error := astutil.AstCast[*ast.FuncDecl](node.ASTNode()); error == nil {
 		fd, err := ApplicationContexter.ReadBeanFactoryDefinition(node)
 		if err != nil {
 			Logger.Warnf("failed parse beanDefinition, %+v", node)

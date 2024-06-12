@@ -1,13 +1,23 @@
 package app
 
+import (
+	"context"
+
+	"github.com/gosrob/autumn/pkg/annotation"
+)
+
 type ApplicationContext struct {
+	Metainfo annotation.MetaInfo
 	BeanDefinitionReader
 	BeanRegistryer
 }
 
 var ApplicationContexter ApplicationContext
 
-func (a *ApplicationContext) Run() map[string][]byte {
+func (a *ApplicationContext) ScanCollect(ctx context.Context) {
+}
+
+func (a *ApplicationContext) Run(ctx context.Context) map[string][]byte {
 	// NOTE: Run to here means that all annotations are already collected, and parsed, but alias name is not set.
 
 	// TODO: So first set alias name in registry

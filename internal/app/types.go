@@ -1,6 +1,6 @@
 package app
 
-type AnnotationList []any
+type AnnotationList any
 
 // # represents a struct
 //
