@@ -10,6 +10,7 @@ type ApplicationContext struct {
 	Metainfo annotation.MetaInfo
 	BeanDefinitionReader
 	BeanRegistryer
+	ListableBeanFactory
 }
 
 var ApplicationContexter ApplicationContext
@@ -43,6 +44,7 @@ func (a *ApplicationContext) Run(ctx context.Context) map[string][]byte {
 }
 
 func (a *ApplicationContext) SetAlias() {
+	a.ResolveAlias()
 }
 
 func (a *ApplicationContext) CreateZeroBean() {

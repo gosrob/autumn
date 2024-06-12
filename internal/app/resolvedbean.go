@@ -1,14 +1,41 @@
 package app
 
 type beanResolver interface {
-	Resolve(n any)
+	GetDecl() string
+	GetType() string
+	GetAlias() string
+	RandomName()
+	GetConstructText() string
 }
 
-type beanResolve struct{}
+type beanResolve struct {
+	decl string
+	tp   string
+}
 
-// Resolve implements beanResolver.
-func (b *beanResolve) Resolve(n any) {
+// GetAlias implements beanResolver.
+func (b *beanResolve) GetAlias() string {
 	panic("unimplemented")
+}
+
+// GetConstructText implements beanResolver.
+func (b *beanResolve) GetConstructText() string {
+	panic("unimplemented")
+}
+
+// RandomName implements beanResolver.
+func (b *beanResolve) RandomName() {
+	panic("unimplemented")
+}
+
+// GetDecl implements beanResolver.
+func (b *beanResolve) GetDecl() string {
+	return b.decl
+}
+
+// GetType implements beanResolver.
+func (b *beanResolve) GetType() string {
+	return b.tp
 }
 
 var (

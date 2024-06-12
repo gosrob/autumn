@@ -40,3 +40,9 @@ var FactoryCanOnlyProduceOneError Error = Error{
 	Code:  1,
 	inner: nil,
 }
+
+var DepulicatedBeanAliasError Error = Error{
+	Msg:   "bean alias has already set",
+	Code:  1,
+	inner: nil,
+}
