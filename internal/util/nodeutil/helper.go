@@ -1,6 +1,9 @@
 package nodeutil
 
+import "strings"
+
 type Type struct {
+	TypeName       string
 	PureType       string
 	IsArray        bool
 	IsPointer      bool
@@ -28,7 +31,14 @@ func GetType(tp string) Type {
 		pureType = pureType[1:]
 	}
 
+	typeName := pureType
+	if dotIndex := len(pureType) - 1; dotIndex >= 0 && strings.Contains(pureType, ".") {
+		splitType := strings.Split(pureType, ".")
+		typeName = splitType[len(splitType)-1]
+	}
+
 	return Type{
+		TypeName:       typeName,
 		PureType:       pureType,
 		IsArray:        isArray,
 		IsPointer:      isPointer,

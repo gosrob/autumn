@@ -8,6 +8,7 @@ import (
 	. "github.com/gosrob/autumn/internal/app"
 	. "github.com/gosrob/autumn/internal/logger"
 	"github.com/gosrob/autumn/internal/util/astutil"
+	pkg "github.com/gosrob/autumn/pkg/annotation"
 )
 
 type processor struct{}
@@ -26,22 +27,24 @@ func (p *processor) Output() map[string][]byte {
 
 // Process implements annotation.AnnotationProcessor.
 func (p *processor) Process(node annotation.Node) error {
-	if _, error := astutil.AstCast[*ast.TypeSpec](node.ASTNode()); error == nil {
-		bd, err := ApplicationContexter.ReadBeanDefinition(node)
-		if err != nil {
-			Logger.Warnf("failed parse beanDefinition, %+v", node)
-			return err
+	if len(annotation.FindAnnotations[pkg.Bean](node.Annotations())) > 0 {
+		if _, error := astutil.AstCast[*ast.TypeSpec](node.ASTNode()); error == nil {
+			bd, err := ApplicationContexter.ReadBeanDefinition(node)
+			if err != nil {
+				Logger.Warnf("failed parse beanDefinition, %+v", node)
+				return err
+			}
+			ApplicationContexter.RegisterBeanDefinition(bd)
 		}
-		ApplicationContexter.RegisterBeanDefinition(bd)
-	}
 
-	if _, error := astutil.AstCast[*ast.FuncDecl](node.ASTNode()); error == nil {
-		fd, err := ApplicationContexter.ReadBeanFactoryDefinition(node)
-		if err != nil {
-			Logger.Warnf("failed parse beanDefinition, %+v", node)
-			return err
+		if _, error := astutil.AstCast[*ast.FuncDecl](node.ASTNode()); error == nil {
+			fd, err := ApplicationContexter.ReadBeanFactoryDefinition(node)
+			if err != nil {
+				Logger.Warnf("failed parse beanDefinition, %+v", node)
+				return err
+			}
+			ApplicationContexter.RegisterBeanFactoryDefinition(fd)
 		}
-		ApplicationContexter.RegisterBeanFactoryDefinition(fd)
 	}
 
 	return nil

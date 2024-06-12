@@ -2,9 +2,12 @@ package astutil
 
 import (
 	"go/ast"
+	"path"
 
+	annotation "github.com/YReshetko/go-annotation/pkg"
 	"github.com/gosrob/autumn/internal/errorcode"
 	"github.com/gosrob/autumn/internal/util/parser"
+	"github.com/gosrob/autumn/internal/util/stream"
 )
 
 func AstCast[T any](node ast.Node) (T, error) {
@@ -57,8 +60,44 @@ func IsAnotherPackage(expr ast.Expr) bool {
 		if ident, ok := e.X.(*ast.Ident); ok {
 			return ident.Obj == nil
 		}
+	case *ast.StarExpr:
+		return IsAnotherPackage(e.X)
 	}
 	return false
+}
+
+func IsAnotherPackageOrGetPkgPath(expr ast.Expr, ims []string) (bool, string) {
+	if !IsAnotherPackage(expr) {
+		return false, ""
+	}
+
+	switch v := expr.(type) {
+	case *ast.SelectorExpr:
+		if ident, ok := v.X.(*ast.Ident); ok {
+			for _, im := range ims {
+				if path.Base(im) == "." {
+					return false, ""
+				}
+				if ident.Name == path.Base(im) {
+					return true, im
+				}
+			}
+		}
+	case *ast.StarExpr:
+		if sel, ok := v.X.(*ast.SelectorExpr); ok {
+			if ident, ok := sel.X.(*ast.Ident); ok {
+				for _, im := range ims {
+					if path.Base(im) == "." {
+						return false, ""
+					}
+					if ident.Name == path.Base(im) {
+						return true, im
+					}
+				}
+			}
+		}
+	}
+	return false, ""
 }
 
 func GetFieldPackageAndTypeName(f *ast.Field) (pkg string, name string) {
@@ -94,4 +133,36 @@ func panicOnError[T any](v T, e error) T {
 		panic(e)
 	}
 	return v
+}
+
+func GetExprType(tp ast.Expr) string {
+	switch v := tp.(type) {
+	case *ast.Ident:
+		return v.Name
+	case *ast.StarExpr:
+		return "*" + GetExprType(v.X)
+	case *ast.SelectorExpr:
+		return GetExprType(v.X) + "." + v.Sel.Name
+	case *ast.ArrayType:
+		return "[]" + GetExprType(v.Elt)
+	case *ast.MapType:
+		return "map[" + GetExprType(v.Key) + "]" + GetExprType(v.Value)
+	case *ast.StructType:
+		if len(v.Fields.List) > 0 {
+			if ident, ok := v.Fields.List[0].Type.(*ast.Ident); ok {
+				return ident.Name
+			}
+		}
+		return "struct"
+	default:
+		return ""
+	}
+}
+
+func GetImportsStrings(n annotation.Node) []string {
+	return stream.Map(
+		stream.OfSlice(n.Imports()),
+		func(t *ast.ImportSpec) string { return t.Path.Value }).
+		Filter(stream.Distinct[string]()).
+		ToSlice()
 }

@@ -22,7 +22,7 @@ func (e *Error) Instance() *Error {
 	return &ins
 }
 
-func (e *Error) Printf(format string, params ...string) *Error {
+func (e *Error) Printf(format string, params ...any) *Error {
 	e.Msg += fmt.Sprintf(" : "+format, params)
 	return e
 }
@@ -32,5 +32,11 @@ var _ error = (*Error)(nil)
 var CastError Error = Error{
 	Msg:   "cast fail",
 	Code:  0,
+	inner: nil,
+}
+
+var FactoryCanOnlyProduceOneError Error = Error{
+	Msg:   "bean factory can only produce one",
+	Code:  1,
 	inner: nil,
 }

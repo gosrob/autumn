@@ -6,11 +6,14 @@ type BeanRegistryer interface {
 	RegisterBeanFactoryDefinition(factoryFuncDefinition FactoryFuncDefinition)
 }
 
-type beanRegistry struct{}
+type beanRegistry struct {
+	beans        map[string][]BeanDefinition
+	beansFactory map[string][]FactoryFuncDefinition
+}
 
 // RegisterBeanFactoryDefinition implements BeanRegistryer.
 func (b *beanRegistry) RegisterBeanFactoryDefinition(factoryFuncDefinition FactoryFuncDefinition) {
-	panic("unimplemented")
+	b.beansFactory[string(factoryFuncDefinition.BeanClass)] = append(b.beansFactory[string(factoryFuncDefinition.BeanClass)], factoryFuncDefinition)
 }
 
 // RegisterBeanDefinitionByName implements BeanRegistryer.
@@ -20,7 +23,7 @@ func (b *beanRegistry) RegisterBeanDefinitionByName(name string, beanDefinition 
 
 // RegisterBeanDefinition implements BeanRegistryer.
 func (b *beanRegistry) RegisterBeanDefinition(beanDefinition BeanDefinition) {
-	panic("unimplemented")
+	b.beans[string(beanDefinition.BeanClass)] = append(b.beans[string(beanDefinition.BeanClass)], beanDefinition)
 }
 
 var _ BeanRegistryer = (*beanRegistry)(nil)
