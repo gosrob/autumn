@@ -12,6 +12,7 @@ import (
 	"github.com/gosrob/autumn/internal/util/cast"
 	"github.com/gosrob/autumn/internal/util/nodeutil"
 	"github.com/gosrob/autumn/internal/util/parser"
+	"github.com/gosrob/autumn/internal/util/pkginfo"
 	pkg "github.com/gosrob/autumn/pkg/annotation"
 	"github.com/samber/lo"
 )
@@ -33,7 +34,7 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanDefinition(n any) (BeanDefini
 		return b, err
 	}
 
-	beanClass, isBasicType, dependsOn, isPrimary, isLazy, alias, bean, err := extractNode(node)
+	beanClass, isBasicType, dependsOn, isPrimary, isLazy, alias, bean, pkg, err := extractNode(node)
 	if err != nil {
 		return b, err
 	}
@@ -45,25 +46,31 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanDefinition(n any) (BeanDefini
 		IsLazy:        isLazy,
 		Alias:         alias,
 		Bean:          bean,
+		Pachage:       pkg,
 	}
 	return b, nil
 }
 
 var _ BeanDefinitionReader = (*goAnnotationBeanDefinitionReader)(nil)
 
-func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, dependsOn []string, isPrimary bool, isLazy bool, alias string, bean StructDefinition, err error) {
+func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, dependsOn []string, isPrimary bool, isLazy bool, alias string, bean StructDefinition, pkgInfo Package, err error) {
 	var node annotation.Node
 	node, err = cast.Cast[annotation.Node](n)
 	if err != nil {
 		logger.Logger.Warnf("extract node faild err:%s", err)
 	}
+	pkgInfo.FileAbsolutePath = n.Meta().Dir()
+	pkgInfo.CurrentPackage = n.Meta().PackageName()
+	pkgInfo.CurrentFullPackage = pkginfo.GetFullPackage(pkgInfo.FileAbsolutePath).ImportPath
+
 	typeSpec := node.ASTNode().(*ast.TypeSpec)
 	logger.Logger.Debugf("type spec is %+v", typeSpec)
 
 	// isBasicType
-	isBasicType = astutil.IsBasicType(node.ASTNode().(ast.Expr))
+	isBasicType = astutil.IsBasicType(typeSpec.Type.(ast.Expr))
 	// beanClass
-	beanClass = BeanClass(node.Meta().PackageName() + "." + nodeutil.GetType(typeSpec.Name.Name).PureType)
+
+	beanClass = BeanClass(astutil.BuildFullpathPackage(nodeutil.GetType(typeSpec.Name.Name).PureType, pkgInfo.CurrentFullPackage))
 
 	// dependsOn
 	dependsOn, err = extractDepends(n.ASTNode(), n.Imports())
@@ -84,6 +91,7 @@ func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, depe
 	if err == nil {
 		bean.Fields = fds
 	}
+
 	return
 }
 

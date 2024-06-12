@@ -32,6 +32,8 @@ type BeanDefinition struct {
 	Consturcts map[string]Constructor
 
 	Bean StructDefinition
+
+	Pachage Package
 }
 
 type Constructor struct {

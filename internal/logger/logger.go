@@ -211,7 +211,7 @@ func (l *mLogger) CatchPanic() {
 				line = frame.Line
 			}
 			formattedFile := fileWithLine(frame.File, frame.Line)
-			formattedFunc := fmt.Sprintf("%.30s", frame.Function)
+			formattedFunc := fmt.Sprintf("%.100s", frame.Function)
 			fmt.Fprintf(buf, "%-24s | %s\n", formattedFile, formattedFunc)
 			if !more {
 				break
