@@ -14,11 +14,18 @@ type BeanRegistryer interface {
 	GetAllFactoryBeans() []FactoryFuncDefinition
 	GetBeanDefinition(className string) []BeanDefinition
 	GetBeanFactoryDefinition(className string) []FactoryFuncDefinition
+	Reset()
 }
 
 type beanRegistry struct {
 	beans        map[string][]BeanDefinition
 	beansFactory map[string][]FactoryFuncDefinition
+}
+
+// Reset implements BeanRegistryer.
+func (b *beanRegistry) Reset() {
+	b.beans = make(map[string][]BeanDefinition)
+	b.beansFactory = make(map[string][]FactoryFuncDefinition)
 }
 
 // GetBeanDefinition implements BeanRegistryer.
