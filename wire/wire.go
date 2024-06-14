@@ -7,14 +7,22 @@
 package wire
 
 import (
+	"github.com/gosrob/autumn/pkg/container"
 	"github.com/gosrob/autumn/testdata/beandefinition"
+	"github.com/gosrob/autumn/testdata/beandefinition/subdirectory"
+	"github.com/samber/do/v2"
 )
 
 func init() {
+	var1_Hijfn := beandefinition.DefinitionDemo{}
+	var1_mmFdv := subdirectory.C{}
+	var1_DqOxp := *beandefinition.ProduceDefinitionDemo(&var1_mmFdv)
 
-	var1_mPCRM := beandefinition.DefinitionDemo{}
-	var1_wSXLM := *beandefinition.ProduceDefinition()
-	var1_XwvIA := *beandefinition.ProduceDefinitionDemo()
+	var1_Hijfn.B = var1_DqOxp
 
-	var1_mPCRM.B = var1_XwvIA
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition.DefinitionDemo", var1_Hijfn)
+
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.C", var1_mmFdv)
+
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.B", var1_DqOxp)
 }

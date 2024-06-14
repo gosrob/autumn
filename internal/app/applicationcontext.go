@@ -7,6 +7,7 @@ import (
 
 	"github.com/gosrob/autumn/internal/errorcode"
 	"github.com/gosrob/autumn/internal/logger"
+	"github.com/gosrob/autumn/internal/util/logic"
 	"github.com/gosrob/autumn/internal/util/pkginfo"
 	"github.com/gosrob/autumn/internal/util/stream"
 	"github.com/gosrob/autumn/pkg/annotation"
@@ -25,16 +26,21 @@ type ApplicationContext struct {
 var ApplicationContexter ApplicationContext
 
 func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) {
+	var err error
 	// NOTE: Run to here means that all annotations are already collected, and parsed, but alias name is not set.
 
 	// TODO: So first set alias name in registry
 	a.SetAlias()
 
 	// TODO: begin to create bean with zero value(if not has factory func), if has factory func, then initialize it with factory func, and push to resolvedRegistry
-	a.CreateZeroBean()
+	err = a.CreateZeroBean()
+	if err != nil {
+		logger.Logger.Fatalf("create bean fail %s", err)
+		return nil
+	}
 
 	// TODO: before inject attributes, check attributes, if one attributes has gt 1 beans && these beans do not have primary flag set, then FatalLog this error
-	err := a.Check()
+	err = a.Check()
 	if err != nil {
 		logger.Logger.Fatalf("check beans error %s", err)
 		return nil
@@ -69,6 +75,8 @@ func (a *ApplicationContext) initBeanBuilder() func() {
 package %s
 
 import (
+	"github.com/gosrob/autumn/pkg/container"
+	"github.com/samber/do/v2"
     %s
 )
 
@@ -101,14 +109,33 @@ func (a *ApplicationContext) SetAlias() {
 	a.ResolveAlias()
 }
 
-func (a *ApplicationContext) CreateZeroBean() {
+func (a *ApplicationContext) CreateZeroBean() error {
 	// Get bean trigger factory create bean
 	for _, bd := range a.GetAllBeans() {
 		a.GetBean(string(bd.BeanClass))
 	}
 	for _, bd := range a.GetAllFactoryBeans() {
-		a.GetBean(string(bd.BeanClass))
+		if len(bd.Bean.Params) <= 0 {
+			a.GetBean(string(bd.BeanClass))
+		}
 	}
+	for _, bd := range a.GetAllFactoryBeans() {
+		if len(bd.Bean.Params) > 0 {
+			callParams := []string{}
+			params := bd.Bean.Params
+			for _, p := range params {
+				b, err := a.GetBean(p.Type)
+				if err != nil {
+					return &errorcode.BeanNotFindError
+				}
+
+				callParams = append(callParams, logic.OrGet(p.TypeInfo.IsPointer, "&"+b.GetDecl(), b.GetDecl()))
+			}
+			a.GetBean(string(bd.BeanClass), callParams...)
+		}
+	}
+
+	return nil
 }
 
 func (a *ApplicationContext) Check() error {
@@ -205,4 +232,11 @@ func conferName(rd beanResolver, names map[string]any) {
 }
 
 func (a *ApplicationContext) Inject() {
+	temp := `
+	do.ProvideNamedValue(container.Container, "%s", %s)
+`
+	for _, rb := range a.GetAllResolvedBeans() {
+		inject := fmt.Sprintf(temp+"\n", rb.GetDefinitionBase().BeanClass, rb.GetDecl())
+		a.containerBuilder.WriteString(inject)
+	}
 }

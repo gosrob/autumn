@@ -70,6 +70,7 @@ func IsAnotherPackageOrGetPkgPath(expr ast.Expr, ims []string) (bool, string) {
 	if !IsAnotherPackage(expr) {
 		return false, ""
 	}
+	ims = stream.OfSlice(ims).Map(stream.TrimQuote()).ToSlice()
 
 	switch v := expr.(type) {
 	case *ast.SelectorExpr:
