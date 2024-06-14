@@ -31,6 +31,8 @@ type Field struct {
 	// if field type is basic type, it just act like a normal type.
 	Type string
 
+	TypeInfo nodeutil.Type
+
 	Annotations AnnotationList
 }
 

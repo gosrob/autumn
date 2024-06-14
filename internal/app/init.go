@@ -11,5 +11,6 @@ func init() {
 		BeanDefinitionReader: &GoAnnotationBeanDefinitionReader,
 		BeanRegistryer:       &BeanRegistry,
 		ListableBeanFactory:  DefaultBeanFactory,
+		ProjectScanner:       ProjectScanner{},
 	}
 }
