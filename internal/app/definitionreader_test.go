@@ -32,6 +32,6 @@ func TestExtractBeanDepends(t *testing.T) {
 		return true
 	})
 
-	extractDepends(node, imports)
-	extractFields(node, imports)
+	extractDepends(node, imports, "")
+	extractFields(node, imports, "")
 }

@@ -10,6 +10,9 @@ type Error struct {
 
 // Error implements error.
 func (e *Error) Error() string {
+	if _, ok := e.inner.(*Error); ok && e.inner != nil {
+		return e.inner.Error()
+	}
 	return fmt.Sprintf("%s \n -----> inner error: %s", e.Msg, e.inner)
 }
 

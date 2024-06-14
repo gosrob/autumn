@@ -32,7 +32,7 @@ func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, depe
 	beanClass = BeanClass(astutil.BuildFullpathPackage(nodeutil.GetType(typeSpec.Name.Name).PureType, pkgInfo.CurrentFullPackage))
 
 	// dependsOn
-	dependsOn, _ = extractDepends(n.ASTNode(), n.Imports())
+	dependsOn, _ = extractDepends(n.ASTNode(), n.Imports(), pkgInfo.CurrentFullPackage)
 
 	annotations := annotation.FindAnnotations[pkg.Bean](node.Annotations())
 	if len(annotations) > 0 {
@@ -46,7 +46,7 @@ func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, depe
 	if err == nil {
 		bean.Name = astutil.BuildFullpathPackage(tp, node.Meta().PackageName())
 	}
-	fds, err := extractFields(n.ASTNode(), n.Imports())
+	fds, err := extractFields(n.ASTNode(), n.Imports(), pkgInfo.CurrentFullPackage)
 	if err == nil {
 		bean.Fields = fds
 	}
@@ -67,10 +67,10 @@ func extractStructType(spec ast.Node) (tp string, err error) {
 	return "", fmt.Errorf("no struct type found")
 }
 
-func extractFields(n ast.Node, ims []*ast.ImportSpec) (fields []Field, err error) {
+func extractFields(n ast.Node, ims []*ast.ImportSpec, currentPkg string) (fields []Field, err error) {
 	visitor := astutil.NewVisitor(func(ns ast.Node) {
 		if f, ok := ns.(*ast.Field); ok {
-			field, err := extractField(f, ims)
+			field, err := extractField(f, ims, currentPkg)
 			if err != nil {
 				return
 			}
@@ -81,11 +81,11 @@ func extractFields(n ast.Node, ims []*ast.ImportSpec) (fields []Field, err error
 	return
 }
 
-func extractField(f *ast.Field, ims []*ast.ImportSpec) (field Field, err error) {
+func extractField(f *ast.Field, ims []*ast.ImportSpec, currentPkg string) (field Field, err error) {
 	if len(f.Names) > 0 {
 		field.Name = f.Names[0].Name
 	}
-	field.Type = extractBeanClass(f, ims)
+	field.Type = extractBeanClass(f, ims, currentPkg)
 
 	cmt, ok := astutil.Comment(f)
 	if ok {
@@ -100,10 +100,10 @@ func extractField(f *ast.Field, ims []*ast.ImportSpec) (field Field, err error) 
 	return
 }
 
-func extractDepends(n ast.Node, ims []*ast.ImportSpec) (dependsOn []string, err error) {
+func extractDepends(n ast.Node, ims []*ast.ImportSpec, currentPkg string) (dependsOn []string, err error) {
 	visitor := astutil.NewVisitor(func(ns ast.Node) {
 		if f, ok := ns.(*ast.Field); ok {
-			bclz := extractBeanClass(f, ims)
+			bclz := extractBeanClass(f, ims, currentPkg)
 			if bclz == "" {
 				return
 			}
@@ -114,8 +114,12 @@ func extractDepends(n ast.Node, ims []*ast.ImportSpec) (dependsOn []string, err 
 	return
 }
 
-func extractBeanClass(f *ast.Field, ims []*ast.ImportSpec) string {
+func extractBeanClass(f *ast.Field, ims []*ast.ImportSpec, currentPkg string) string {
 	pkg, name := astutil.GetFieldPackageAndTypeName(f)
+	if pkg == "" {
+		pkg = currentPkg
+		return pkg + "." + name
+	}
 	pkgArr := lo.Map(ims, func(item *ast.ImportSpec, index int) string {
 		return strings.Trim(item.Path.Value, "\"")
 	})

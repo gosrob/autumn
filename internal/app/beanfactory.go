@@ -116,7 +116,7 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 		return b[0], nil
 	}
 
-	return nil, &errorcode.CreateZeroBeanError
+	return nil, errorcode.CreateZeroBeanError.Instance().Printf("need bean class: %s", className)
 }
 
 // GetBeans implements ListableBeanFactory.
