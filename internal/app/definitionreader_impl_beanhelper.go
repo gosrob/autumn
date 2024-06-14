@@ -69,7 +69,6 @@ func extractStructType(spec ast.Node) (tp string, err error) {
 
 func extractFields(n ast.Node, ims []*ast.ImportSpec) (fields []Field, err error) {
 	visitor := astutil.NewVisitor(func(ns ast.Node) {
-		logger.Logger.Debugf("start extractDepend %+v", n)
 		if f, ok := ns.(*ast.Field); ok {
 			field, err := extractField(f, ims)
 			if err != nil {
@@ -103,7 +102,6 @@ func extractField(f *ast.Field, ims []*ast.ImportSpec) (field Field, err error) 
 
 func extractDepends(n ast.Node, ims []*ast.ImportSpec) (dependsOn []string, err error) {
 	visitor := astutil.NewVisitor(func(ns ast.Node) {
-		logger.Logger.Debugf("start extractDepend %+v", n)
 		if f, ok := ns.(*ast.Field); ok {
 			bclz := extractBeanClass(f, ims)
 			if bclz == "" {

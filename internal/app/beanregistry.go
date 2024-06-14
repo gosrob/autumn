@@ -14,12 +14,25 @@ type BeanRegistryer interface {
 	GetAllFactoryBeans() []FactoryFuncDefinition
 	GetBeanDefinition(className string) []BeanDefinition
 	GetBeanFactoryDefinition(className string) []FactoryFuncDefinition
+	GetBeanClassStrs() []string
 	Reset()
 }
 
 type beanRegistry struct {
 	beans        map[string][]BeanDefinition
 	beansFactory map[string][]FactoryFuncDefinition
+}
+
+// GetBeanClassStrs implements BeanRegistryer.
+func (b *beanRegistry) GetBeanClassStrs() []string {
+	bdclass := []string{}
+	for _, bd := range b.GetAllBeans() {
+		bdclass = append(bdclass, string(bd.BeanClass))
+	}
+	for _, bd := range b.GetAllFactoryBeans() {
+		bdclass = append(bdclass, string(bd.BeanClass))
+	}
+	return bdclass
 }
 
 // Reset implements BeanRegistryer.

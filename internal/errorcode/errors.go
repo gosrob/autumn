@@ -46,3 +46,27 @@ var DepulicatedBeanAliasError Error = Error{
 	Code:  1,
 	inner: nil,
 }
+
+var CreateZeroBeanError Error = Error{
+	Msg:   "bean can not create, because there is no definitio to create it",
+	Code:  2,
+	inner: nil,
+}
+
+var BeanPrimaryError Error = Error{
+	Msg:   "if bean has more then one definition, there must be only one primary bean",
+	Code:  3,
+	inner: nil,
+}
+
+var BeanNotFindError Error = Error{
+	Msg:   "all beans has be set, but can not found wire bean",
+	Code:  4,
+	inner: nil,
+}
+
+var MetaInfoNotDefined Error = Error{
+	Msg:   "must define one metainfo",
+	Code:  5,
+	inner: nil,
+}

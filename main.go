@@ -11,5 +11,6 @@ import (
 
 func main() {
 	defer logger.Logger.CatchPanic()
+	logger.Logger.SetIsDebug(true)
 	annotation.Process()
 }

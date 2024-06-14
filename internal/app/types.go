@@ -1,5 +1,10 @@
 package app
 
+import (
+	"github.com/gosrob/autumn/internal/util/nodeutil"
+	"github.com/gosrob/autumn/internal/util/parser"
+)
+
 type AnnotationList any
 
 // # represents a struct
@@ -29,6 +34,18 @@ type Field struct {
 	Annotations AnnotationList
 }
 
+func FindFieldAnnotation[T any](f Field) (find []T) {
+	if ans, ok := f.Annotations.([]parser.Annotation); ok {
+		for _, v := range ans {
+			vv, err := parser.Cast[T](v)
+			if err == nil {
+				find = append(find, vv)
+			}
+		}
+	}
+	return
+}
+
 // FuncDefinition represents the structure of a function definition, including its name,
 // parameters, and results.
 type FuncDefinition struct {
@@ -43,7 +60,10 @@ type FuncDefinition struct {
 type Param struct {
 	Name string // Name is the name of the parameter.
 
-	Type string // Type is the type of the parameter. It can be a full package type
+	// Type is the type of the parameter. It can be a full package type
 	// (e.g., *github.com/xxx/xxx/pkg.{TypeName} for a pointer type in another package)
 	// or a basic type.
+	Type string
+
+	TypeInfo nodeutil.Type
 }

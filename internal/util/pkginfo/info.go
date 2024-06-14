@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os/exec"
+	"strings"
 )
 
 type PackageInfo struct {
@@ -30,4 +31,12 @@ func GetFullPackage(fileDir string) PackageInfo {
 	}
 
 	return pkgInfo
+}
+
+func GetPackageFromFilePath(path string) string {
+	parts := strings.Split(path, "/")
+	if len(parts) > 1 {
+		return parts[len(parts)-2]
+	}
+	return ""
 }

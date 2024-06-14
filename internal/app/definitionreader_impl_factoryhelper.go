@@ -72,8 +72,9 @@ func extractParam(n annotation.Node) (params []Param) {
 
 			for _, name := range field.Names {
 				params = append(params, Param{
-					Name: name.Name,
-					Type: tps,
+					Name:     name.Name,
+					Type:     tps,
+					TypeInfo: tp,
 				})
 			}
 		}
@@ -96,8 +97,9 @@ func extractResult(n annotation.Node) (results []Param) {
 			tps := astutil.BuildFullpathPackage(nodeutil.GetType(tp.PureType).TypeName, pkgPath)
 
 			results = append(results, Param{
-				Name: "",
-				Type: tps,
+				Name:     "",
+				Type:     tps,
+				TypeInfo: tp,
 			})
 		}
 	}

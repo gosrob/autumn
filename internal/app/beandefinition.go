@@ -2,8 +2,7 @@ package app
 
 type BeanClass string
 
-// BeanDefinition represents the definition of a bean in the application.
-type BeanDefinition struct {
+type DefinitionBase struct {
 	// IsBuiltinType indicates whether the type is a built-in Go type.
 	IsBuiltinType bool
 
@@ -26,14 +25,13 @@ type BeanDefinition struct {
 
 	Alias string
 
-	// Consturcts is a map where each key is a string representing the name of a bean,
-	// and each value is a Constructor function that creates an instance of that bean.
-	// TODO: Currently, this field is not used.
-	Consturcts map[string]Constructor
-
-	Bean StructDefinition
-
 	Pachage Package
+}
+
+// BeanDefinition represents the definition of a bean in the application.
+type BeanDefinition struct {
+	DefinitionBase
+	Bean StructDefinition
 }
 
 type Constructor struct {

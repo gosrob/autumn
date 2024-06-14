@@ -21,15 +21,16 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanFactoryDefinition(n any) (Fac
 		return factory, err
 	}
 	factory = FactoryFuncDefinition{
-		IsBuiltinType: isBuiltinType,
-		BeanClass:     BeanClass(beanClass),
-		DependsOn:     dependsOn,
-		IsPrimary:     isPrimary,
-		IsLazy:        isLazy,
-		Alias:         alias,
-		Consturcts:    map[string]Constructor{},
-		Bean:          bean,
-		Pachage:       pkg,
+		DefinitionBase: DefinitionBase{
+			IsBuiltinType: isBuiltinType,
+			BeanClass:     BeanClass(beanClass),
+			DependsOn:     dependsOn,
+			IsPrimary:     isPrimary,
+			IsLazy:        isLazy,
+			Alias:         alias,
+			Pachage:       pkg,
+		},
+		Bean: bean,
 	}
 
 	return factory, nil
@@ -50,14 +51,16 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanDefinition(n any) (BeanDefini
 		return b, err
 	}
 	b = BeanDefinition{
-		IsBuiltinType: isBasicType,
-		BeanClass:     beanClass,
-		DependsOn:     dependsOn,
-		IsPrimary:     isPrimary,
-		IsLazy:        isLazy,
-		Alias:         alias,
-		Bean:          bean,
-		Pachage:       pkg,
+		DefinitionBase: DefinitionBase{
+			IsBuiltinType: isBasicType,
+			BeanClass:     beanClass,
+			DependsOn:     dependsOn,
+			IsPrimary:     isPrimary,
+			IsLazy:        isLazy,
+			Alias:         alias,
+			Pachage:       pkg,
+		},
+		Bean: bean,
 	}
 	return b, nil
 }

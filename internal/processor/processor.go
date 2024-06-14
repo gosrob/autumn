@@ -27,6 +27,10 @@ func (p *processor) Output() map[string][]byte {
 
 // Process implements annotation.AnnotationProcessor.
 func (p *processor) Process(node annotation.Node) error {
+	if len(annotation.FindAnnotations[pkg.MetaInfo](node.Annotations())) > 0 {
+		metas := annotation.FindAnnotations[pkg.MetaInfo](node.Annotations())
+		ApplicationContexter.Metainfo = &metas[0]
+	}
 	if len(annotation.FindAnnotations[pkg.Bean](node.Annotations())) > 0 {
 		if _, error := astutil.AstCast[*ast.TypeSpec](node.ASTNode()); error == nil {
 			bd, err := ApplicationContexter.ReadBeanDefinition(node)

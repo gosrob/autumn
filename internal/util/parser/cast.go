@@ -8,10 +8,10 @@ import (
 	"github.com/gosrob/autumn/internal/util/stream"
 )
 
-func Cast[T any](a annotation) (T, error) {
+func Cast[T any](a Annotation) (T, error) {
 	var t T
 	name := reflect.TypeOf(t).Name()
-	if a.name == name {
+	if a.Name() == name {
 		err := mapToStruct(a.Params(), &t)
 		if err == nil {
 			return t, nil

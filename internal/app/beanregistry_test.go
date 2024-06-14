@@ -24,10 +24,14 @@ func (suite *registerSuite) TearDownTest() {
 
 func (s *registerSuite) TestBasicBeans() {
 	s.r.RegisterBeanDefinition(app.BeanDefinition{
-		BeanClass: "test1",
+		DefinitionBase: app.DefinitionBase{
+			BeanClass: "test1",
+		},
 	})
 	s.r.RegisterBeanDefinition(app.BeanDefinition{
-		BeanClass: "test2",
+		DefinitionBase: app.DefinitionBase{
+			BeanClass: "test2",
+		},
 	})
 
 	s.Assert().Equal(len(s.r.GetAllBeans()), 2, "beans num must gt 0")
@@ -35,10 +39,14 @@ func (s *registerSuite) TestBasicBeans() {
 
 func (s *registerSuite) TestBasicBeansGetBeans() {
 	s.r.RegisterBeanDefinition(app.BeanDefinition{
-		BeanClass: "test1",
+		DefinitionBase: app.DefinitionBase{
+			BeanClass: "test1",
+		},
 	})
 	s.r.RegisterBeanDefinition(app.BeanDefinition{
-		BeanClass: "test2",
+		DefinitionBase: app.DefinitionBase{
+			BeanClass: "test2",
+		},
 	})
 
 	b := s.r.GetBeanDefinition("test2")

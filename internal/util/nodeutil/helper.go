@@ -45,3 +45,11 @@ func GetType(tp string) Type {
 		IsArrayPointer: isArrayPointer,
 	}
 }
+
+func GetShortIdentityByFullPath(tp string) (short string) {
+	parts := strings.Split(tp, "/")
+	if len(parts) > 0 {
+		short = parts[len(parts)-1]
+	}
+	return short
+}

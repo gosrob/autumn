@@ -20,6 +20,11 @@ func (s Stream[T]) close() {
 	close(s.ch)
 }
 
+func (s Stream[T]) Length() int {
+	sl := s.ToSlice()
+	return len(sl)
+}
+
 func (s Stream[T]) ToSlice() []T {
 	var out []T
 	for t := range s.ch {
