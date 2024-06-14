@@ -45,6 +45,8 @@ var cache = CheckerCache{
 	cache: map[string]bool{},
 }
 
+var pkgsCache []*packages.Package
+
 func NewCheckerCache() *CheckerCache {
 	return &CheckerCache{
 		cache: make(map[string]bool),
@@ -110,10 +112,15 @@ func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIden
 		Dir:   dir,
 		Tests: false,
 	}
-	pkgs, err := packages.Load(cfg, "./...")
-	if err != nil || len(pkgs) == 0 {
-		return false, fmt.Errorf("failed to load packages: %s", err)
+	if pkgsCache == nil {
+		pkgs, err := packages.Load(cfg, "./...")
+		if err != nil || len(pkgs) == 0 {
+			return false, fmt.Errorf("failed to load packages: %s", err)
+		}
+		pkgsCache = pkgs
+
 	}
+	pkgs := pkgsCache
 
 	// 构建 AST 和 type 信息
 	pkgMap := make(map[string]*packages.Package)
