@@ -63,7 +63,6 @@ func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) 
 	a.Inject()
 
 	deferedFn()
-	logger.Logger.Debugf("%s", a.containerBuilder.String())
 	// Future TODO: in future canbe  cp all files to ./tmp directory, after that we can rewrite Struct to Struct_base, and our Struct Proxy canbe Struct, so code in our project do not need to change type from struct to structProxy
 	files = map[string][]byte{}
 	files[a.Metainfo.WirePath] = []byte(a.containerBuilder.String())
