@@ -170,7 +170,25 @@ func (l *mLogger) printCallerCode(level log.Level) {
 	l.logger.Log(level, "Code Context:\n\n"+highlightedCode.String())
 }
 
+func (l *mLogger) printCallerCodeLine(level log.Level, file string, line int) {
+	code, err := getCallerCode(file, line)
+	if err != nil {
+		l.logger.Warnf("Unable to retrieve code snippet: %v", err)
+		return
+	}
+
+	var highlightedCode bytes.Buffer
+	if err := quick.Highlight(&highlightedCode, code, "go", "terminal256", "monokai"); err != nil {
+		l.logger.Warnf("Unable to highlight code: %v", err)
+		return
+	}
+
+	l.logger.Log(level, "Code Context:\n\n"+highlightedCode.String())
+}
+
 func (l *mLogger) CatchPanic() {
+	var file string
+	var line int = -1
 	if r := recover(); r != nil {
 		stack := make([]uintptr, 15)
 		length := runtime.Callers(3, stack[:])
@@ -186,8 +204,14 @@ func (l *mLogger) CatchPanic() {
 		frames := runtime.CallersFrames(stack)
 		for {
 			frame, more := frames.Next()
+			if file == "" {
+				file = frame.File
+			}
+			if line == -1 {
+				line = frame.Line
+			}
 			formattedFile := fileWithLine(frame.File, frame.Line)
-			formattedFunc := fmt.Sprintf("%.30s", frame.Function)
+			formattedFunc := fmt.Sprintf("%.100s", frame.Function)
 			fmt.Fprintf(buf, "%-24s | %s\n", formattedFile, formattedFunc)
 			if !more {
 				break
@@ -195,7 +219,7 @@ func (l *mLogger) CatchPanic() {
 		}
 		fmt.Fprintln(buf, "------------------------------------------")
 		l.logger.Error(buf.String())
-		l.printCallerCode(log.FatalLevel)
+		l.printCallerCodeLine(log.FatalLevel, file, line)
 	}
 }
 
