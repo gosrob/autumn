@@ -40,11 +40,14 @@ func (d *DefaultBeanFactoryer) GetPrimaryBean(className string, params ...string
 	if err != nil {
 		return nil, err
 	}
-	p := stream.OfSlice(rbs).Filter(func(br beanResolver) bool { return br.GetDefinitionBase().IsPrimary }).ToSlice()
-	if len(p) != 1 {
+
+	if len(rbs) != 1 {
+		rbs = stream.OfSlice(rbs).Filter(func(br beanResolver) bool { return br.GetDefinitionBase().IsPrimary }).ToSlice()
+	}
+	if len(rbs) != 1 {
 		return nil, &errorcode.BeanPrimaryError
 	}
-	return p[0], nil
+	return rbs[0], nil
 }
 
 // GetAllResolvedBeans implements ListableBeanFactory.

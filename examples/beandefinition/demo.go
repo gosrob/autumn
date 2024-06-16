@@ -5,7 +5,6 @@ import (
 )
 
 // @MetaInfo(wirePath="wire/wire.go")
-// @Test(key="there", key2="here")
 // @Bean(isPrimary="true", isLazy="false", alias="demo")
 type DefinitionDemo struct { // is come
 	// @TestField(key="there")
@@ -17,12 +16,19 @@ type DefinitionDemo struct { // is come
 	Inter []DemoInterface
 }
 
+// @Bean()
+type Interfacea struct{}
+
+func (d *Interfacea) Hello() {
+	panic("not implemented") // TODO: Implement
+}
+
 // @Bean(isLazy="false")
 type DemoInterface interface {
 	Hello()
 }
 
-// @Bean(isPrimary="true", isLazy="false", alias="demo")
+// @Bean(isPrimary="false", isLazy="false", alias="demo")
 func ProduceDefinitionDemo(b *subdirectory.C) *subdirectory.B {
 	return &subdirectory.B{}
 }
