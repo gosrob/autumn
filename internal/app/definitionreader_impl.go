@@ -51,8 +51,8 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanDefinition(n any) (BeanDefini
 		return b, err
 	}
 	b = BeanDefinition{
-		IsInterface: isInterface,
 		DefinitionBase: DefinitionBase{
+			IsInterface:   isInterface,
 			IsBuiltinType: isBasicType,
 			BeanClass:     beanClass,
 			DependsOn:     dependsOn,

@@ -6,16 +6,21 @@ import (
 
 // @MetaInfo(wirePath="wire/wire.go")
 // @Test(key="there", key2="here")
-// @Bean(isPrimary="false", isLazy="false", alias="demo")
+// @Bean(isPrimary="true", isLazy="false", alias="demo")
 type DefinitionDemo struct { // is come
 	// @TestField(key="there")
 
 	// @Autowired(key="there")
 	B subdirectory.B // this is comment
+
+	// @Autowired()
+	Inter DemoInterface
 }
 
-// @Bean(isPrimary="true", isLazy="false")
-type DemoInterface interface{}
+// @Bean(isLazy="false")
+type DemoInterface interface {
+	Hello()
+}
 
 // @Bean(isPrimary="true", isLazy="false", alias="demo")
 func ProduceDefinitionDemo(b *subdirectory.C) *subdirectory.B {

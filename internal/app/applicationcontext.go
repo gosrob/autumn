@@ -29,9 +29,6 @@ func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) 
 	var err error
 	// NOTE: Run to here means that all annotations are already collected, and parsed, but alias name is not set.
 
-	// TODO: So first set alias name in registry
-	a.SetAlias()
-
 	// TODO: begin to create bean with zero value(if not has factory func), if has factory func, then initialize it with factory func, and push to resolvedRegistry
 	err = a.CreateZeroBean()
 	if err != nil {
@@ -58,6 +55,9 @@ func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) 
 		logger.Logger.Fatalf("%s", err)
 		return nil
 	}
+
+	// TODO: So first set alias name in registry
+	a.SetAlias()
 
 	// TODO: run to here all beans and all attributes are set.  then register this to sambar/do container, which is a generic type container
 	a.Inject()
@@ -130,7 +130,15 @@ func (a *ApplicationContext) CreateZeroBean() error {
 
 				callParams = append(callParams, logic.OrGet(p.TypeInfo.IsPointer, "&"+b.GetDecl(), b.GetDecl()))
 			}
-			a.GetBean(string(bd.BeanClass), callParams...)
+			_, err := a.GetBean(string(bd.BeanClass), callParams...)
+			if err != nil {
+				return err
+			}
+		} else {
+			_, err := a.GetBean(string(bd.BeanClass))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -159,6 +167,9 @@ func (a *ApplicationContext) Check() error {
 
 func (a *ApplicationContext) WriteCreateBean() error {
 	for _, bd := range a.GetAllResolvedBeans() {
+		if bd.GetDefinitionBase().IsInterface {
+			continue
+		}
 		a.containerBuilder.WriteString(bd.GetConstructText())
 	}
 	return nil
@@ -166,7 +177,10 @@ func (a *ApplicationContext) WriteCreateBean() error {
 
 func (a *ApplicationContext) Wire() error {
 	for _, bd := range a.GetAllBeans() {
-		s, err := wireAttribute(bd, a.ListableBeanFactory)
+		if bd.IsInterface {
+			continue
+		}
+		s, err := wireAttribute(bd, a.ListableBeanFactory, a.BeanRegistryer)
 		if err != nil {
 			return err
 		}
@@ -176,7 +190,7 @@ func (a *ApplicationContext) Wire() error {
 	return nil
 }
 
-func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory) (string, error) {
+func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer) (string, error) {
 	wireFunc := func(bdi BeanDefinition, rbi beanResolver) (string, error) {
 		var builder strings.Builder
 		wireTempl := `
@@ -190,12 +204,19 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory) (string, error) {
 			if len(autowired) <= 0 {
 				continue
 			}
-			rb, err := lbf.GetBean(f.Type)
+			rb, err := lbf.GetPrimaryBean(f.Type)
 			if err != nil {
 				return "", errorcode.BeanNotFindError.Instance().Printf("%s", err)
 			}
+
+			isInterface := false
+			bd := br.GetBeanDefinition(f.Type)
+			if len(bd) > 0 && bd[0].IsInterface {
+				isInterface = true
+			}
+
 			builder.WriteString(
-				fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, rb.GetDecl()),
+				fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
 			)
 			rbi.SetResolved(f.Name)
 		}

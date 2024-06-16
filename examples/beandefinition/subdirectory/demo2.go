@@ -4,3 +4,7 @@ type B struct{}
 
 // @Bean(isPrimary="true", isLazy="false")
 type C struct{}
+
+func (c *C) Hello() {
+	panic("not implemented") // TODO: Implement
+}

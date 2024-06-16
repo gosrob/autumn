@@ -32,7 +32,7 @@ func (b *beanRegistry) GetBeanClassStrs() []string {
 	for _, bd := range b.GetAllFactoryBeans() {
 		bdclass = append(bdclass, string(bd.BeanClass))
 	}
-	return bdclass
+	return stream.OfSlice(bdclass).Filter(stream.Distinct[string]()).ToSlice()
 }
 
 // Reset implements BeanRegistryer.

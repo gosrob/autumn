@@ -87,6 +87,7 @@ func extractField(f *ast.Field, ims []*ast.ImportSpec, currentPkg string) (field
 		field.Name = f.Names[0].Name
 	}
 	field.Type = extractBeanClass(f, ims, currentPkg)
+	field.TypeInfo = nodeutil.GetType(astutil.GetExprType(f.Type))
 
 	cmt, ok := astutil.Comment(f)
 	if ok {
