@@ -196,6 +196,9 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 		wireTempl := `
     %s.%s = %s
         `
+		wireArrayTempl := `
+    %s.%s = append(%s.%s, %s)
+        `
 		for _, f := range bdi.Bean.Fields {
 			if rbi.IsFiledResolved(f.Name) {
 				continue
@@ -214,10 +217,18 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 			if len(bd) > 0 && bd[0].IsInterface {
 				isInterface = true
 			}
-
-			builder.WriteString(
-				fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
-			)
+			if !f.TypeInfo.IsArray {
+				builder.WriteString(
+					fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
+				)
+			} else {
+				rbs, _ := lbf.GetBeans(f.Type)
+				for _, rb := range rbs {
+					builder.WriteString(
+						fmt.Sprintf(wireArrayTempl, rbi.GetDecl(), f.Name, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
+					)
+				}
+			}
 			rbi.SetResolved(f.Name)
 		}
 		return builder.String(), nil

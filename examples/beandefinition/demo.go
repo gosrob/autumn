@@ -14,7 +14,7 @@ type DefinitionDemo struct { // is come
 	B subdirectory.B // this is comment
 
 	// @Autowired()
-	Inter DemoInterface
+	Inter []DemoInterface
 }
 
 // @Bean(isLazy="false")
