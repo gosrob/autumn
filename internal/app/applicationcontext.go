@@ -19,7 +19,6 @@ type ApplicationContext struct {
 	BeanDefinitionReader
 	BeanRegistryer
 	ListableBeanFactory
-	ProjectScanner
 
 	containerBuilder strings.Builder
 }
@@ -27,7 +26,6 @@ type ApplicationContext struct {
 var ApplicationContexter ApplicationContext
 
 func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) {
-	a.ScanDirectory(pkginfo.GetFullPackage("").Module.Dir)
 	var err error
 	// NOTE: Run to here means that all annotations are already collected, and parsed, but alias name is not set.
 

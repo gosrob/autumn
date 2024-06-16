@@ -53,6 +53,11 @@ func IsBasicType(expr ast.Expr) bool {
 	return false
 }
 
+func IsInterface(expr ast.Expr) bool {
+	_, ok := expr.(*ast.InterfaceType)
+	return ok
+}
+
 // check if an ast.Field is from another package
 func IsAnotherPackage(expr ast.Expr) bool {
 	switch e := expr.(type) {

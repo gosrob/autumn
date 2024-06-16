@@ -55,7 +55,9 @@ func (b *beanRegistry) GetBeanFactoryDefinition(className string) []FactoryFuncD
 func (b *beanRegistry) GetAllBeans() []BeanDefinition {
 	return stream.FlatMap(stream.OfMap(b.beans), func(t stream.Pair[string, []BeanDefinition]) []BeanDefinition {
 		return t.Val2
-	}).ToSlice()
+	}).
+		Filter(stream.DistinctBy(func(t BeanDefinition) string { return string(t.BeanClass) })).
+		ToSlice()
 }
 
 // GetAllFactoryBeans implements BeanRegistryer.

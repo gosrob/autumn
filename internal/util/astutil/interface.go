@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gosrob/autumn/internal/util/pkginfo"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -95,7 +96,8 @@ func collectGoFilesInDirectory(dir string) ([]string, error) {
 
 // 主要的函数：检查类型是否实现了接口，使用缓存
 // 使用 packages 包进行类型检查
-func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIdentity, dir string) (bool, error) {
+func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIdentity string) (bool, error) {
+	dir := pkginfo.GetFullPackage("").Module.Dir
 	cacheKey := fmt.Sprintf("%s implements %s", typeFullIdentity, interfaceFullIdentity)
 	// 检查缓存
 	if result, exists := cache.get(cacheKey); exists {
@@ -110,7 +112,7 @@ func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIden
 	cfg := &packages.Config{
 		Mode:  packages.LoadSyntax,
 		Dir:   dir,
-		Tests: false,
+		Tests: true,
 	}
 	if pkgsCache == nil {
 		pkgs, err := packages.Load(cfg, "./...")
@@ -122,23 +124,102 @@ func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIden
 	}
 	pkgs := pkgsCache
 
-	// 构建 AST 和 type 信息
-	pkgMap := make(map[string]*packages.Package)
+	// // 构建 AST 和 type 信息
+	// pkgMap := make(map[string]*packages.Package)
+	// for _, pkg := range pkgs {
+	// 	pkgMap[pkg.PkgPath] = pkg
+	// 	for range pkg.Syntax {
+	// 		// 使用 types 信息分析
+	// 		typesInfo := pkg.TypesInfo
+	// 		for _, obj := range typesInfo.Defs {
+	// 			// if obj != nil {
+	// 			// 	logger.Logger.Debugf("struct name %s vs checkName %s, struct pkgPath %s vs checkPath %s, ", obj.Name(), typeName, pkg.PkgPath, pkgType)
+	// 			// }
+	// 			// 检查类型
+	// 			if obj != nil && obj.Name() == typeName && pkg.PkgPath == pkgType {
+	// 				typ := obj.Type()
+	// 				for _, obj := range typesInfo.Defs {
+	// 					// 检查接口
+	// 					if obj == nil || obj.Type() == nil || obj.Pkg() == nil {
+	// 						continue
+	// 					}
+	//
+	// 					if obj != nil {
+	// 						name := obj.Name()
+	// 						name = name
+	// 						logger.Logger.Debugf("name %s interfaceName %s, path %s pkgInterface %s", name, interfaceName, obj.Pkg().Path(), pkgInterface)
+	// 					}
+	// 					if obj.Name() == interfaceName && obj.Pkg().Path() == pkgInterface {
+	// 						if obj != nil {
+	// 							itype, ok := obj.Type().Underlying().(*types.Interface)
+	// 							if ok {
+	// 								logger.Logger.Debugf("interface name %s vs checkName %s, interface pkgPath %s vs checkPath %s, itype %s", obj.Name(), interfaceName, pkg.PkgPath, pkgInterface, itype)
+	// 							}
+	// 						}
+	// 						if itype, ok := obj.Type().Underlying().(*types.Interface); ok && types.Implements(types.NewPointer(typ), itype) {
+	// 							cache.set(cacheKey, true)
+	// 							return true, nil
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	/// ===
+
+	var typ types.Type
+
+	var iface *types.Interface
+	foundStruct := false
 	for _, pkg := range pkgs {
-		pkgMap[pkg.PkgPath] = pkg
 		for range pkg.Syntax {
-			// 使用 types 信息分析
+			if foundStruct {
+				break
+			}
 			typesInfo := pkg.TypesInfo
 			for _, obj := range typesInfo.Defs {
-				// 检查类型
-				if obj != nil && obj.Name() == typeName && pkg.PkgPath == pkgType {
-					typ := obj.Type()
-					for _, obj := range typesInfo.Defs {
-						// 检查接口
-						if obj != nil && obj.Name() == interfaceName && obj.Type() != nil && obj.Pkg() != nil && obj.Pkg().Path() == pkgInterface {
-							if itype, ok := obj.Type().Underlying().(*types.Interface); ok && types.Implements(types.NewPointer(typ), itype) {
-								cache.set(cacheKey, true)
-								return true, nil
+				if obj == nil {
+					continue
+				}
+				if obj.Pkg().Path() == pkgType && obj.Name() == typeName {
+					typ = obj.Type()
+					foundStruct = true
+					break
+				}
+			}
+		}
+		if foundStruct {
+			break
+		}
+	}
+
+	foundInterface := false
+	for _, pkg := range pkgs {
+		if foundInterface {
+			break
+		}
+		for range pkg.Syntax {
+			if foundInterface {
+				break
+			}
+			typesInfo := pkg.TypesInfo
+			for _, obj := range typesInfo.Defs {
+				if obj == nil {
+					continue
+				}
+				if obj.Pkg().Path() == pkgInterface && obj.Name() == interfaceName {
+					for _, ifaceObj := range typesInfo.Defs {
+						if ifaceObj == nil {
+							continue
+						}
+						// logger.Logger.Infof("path %s", ifaceObj.Pkg().Path())
+						if ifaceObj.Pkg().Path() == pkgInterface && ifaceObj.Name() == interfaceName {
+							if ifaces, ok := ifaceObj.Type().Underlying().(*types.Interface); ok {
+								iface = ifaces
+								foundInterface = true
+								break
 							}
 						}
 					}
@@ -146,6 +227,15 @@ func CheckIfTypeImplementsInterfaceWithCache(typeFullIdentity, interfaceFullIden
 			}
 		}
 	}
+
+	if iface != nil && typ != nil {
+		if types.Implements(types.NewPointer(typ), iface) {
+			cache.set(cacheKey, true)
+			return true, nil
+		}
+	}
+
+	// ===
 
 	cache.set(cacheKey, false)
 	return false, nil

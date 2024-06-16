@@ -30,6 +30,7 @@ type DefinitionBase struct {
 
 // BeanDefinition represents the definition of a bean in the application.
 type BeanDefinition struct {
+	IsInterface bool
 	DefinitionBase
 	Bean StructDefinition
 }

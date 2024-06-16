@@ -5,10 +5,15 @@ import (
 
 	"github.com/gosrob/autumn/internal/logger"
 	"github.com/gosrob/autumn/internal/util/astutil"
-	"github.com/gosrob/autumn/internal/util/pkginfo"
 )
 
 func TestStructImpl(t *testing.T) {
-	ok, err := astutil.CheckIfTypeImplementsInterfaceWithCache("github.com/gosrob/autumn/internal/app.beanRegistry", "github.com/gosrob/autumn/internal/app.BeanRegistryer", pkginfo.GetFullPackage("").Module.Dir)
+	ok, err := astutil.CheckIfTypeImplementsInterfaceWithCache("github.com/gosrob/autumn/internal/app.beanRegistry", "github.com/gosrob/autumn/internal/app.BeanRegistryer")
+	logger.Logger.Info(ok, err)
+}
+
+func TestStructImplEmptyInterface(t *testing.T) {
+	// ok, err := astutil.CheckIfTypeImplementsInterfaceWithCache("github.com/gosrob/autumn/internal/app.beanRegistry", "github.com/gosrob/autumn/internal/app.BeanRegistryer")
+	ok, err := astutil.CheckIfTypeImplementsInterfaceWithCache("github.com/gosrob/autumn/internal/app.beanRegistry", "github.com/gosrob/autumn/examples/beandefinition.DemoInterface")
 	logger.Logger.Info(ok, err)
 }

@@ -1,7 +1,7 @@
 package beandefinition
 
 import (
-	"github.com/gosrob/autumn/testdata/beandefinition/subdirectory"
+	"github.com/gosrob/autumn/examples/beandefinition/subdirectory"
 )
 
 // @MetaInfo(wirePath="wire/wire.go")
@@ -13,6 +13,9 @@ type DefinitionDemo struct { // is come
 	// @Autowired(key="there")
 	B subdirectory.B // this is comment
 }
+
+// @Bean(isPrimary="true", isLazy="false")
+type DemoInterface interface{}
 
 // @Bean(isPrimary="true", isLazy="false", alias="demo")
 func ProduceDefinitionDemo(b *subdirectory.C) *subdirectory.B {

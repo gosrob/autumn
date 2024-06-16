@@ -6,6 +6,7 @@ import (
 
 	"github.com/gosrob/autumn/internal/errorcode"
 	"github.com/gosrob/autumn/internal/logger"
+	"github.com/gosrob/autumn/internal/util/astutil"
 	"github.com/gosrob/autumn/internal/util/stream"
 	treemap "github.com/liyue201/gostl/ds/map"
 	"github.com/liyue201/gostl/utils/comparator"
@@ -94,14 +95,28 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 	if b, err := d.created.Get(className); err == nil || len(b) > 0 {
 		return b[0], nil
 	}
-	bds := d.registry.GetBeanDefinition(className)
-	for _, bd := range bds {
+	for _, bd := range d.registry.GetAllBeans() {
+		if bd.IsInterface {
+			continue
+		}
 		b, err := d.makeBean(bd)
 		if err != nil {
 			return b, err
 		}
-		d.push(className, b)
+		d.push(string(bd.BeanClass), b)
+
 	}
+	// bds := d.registry.GetBeanDefinition(className)
+	// for _, bd := range bds {
+	// 	if bd.IsInterface {
+	// 		continue
+	// 	}
+	// 	b, err := d.makeBean(bd)
+	// 	if err != nil {
+	// 		return b, err
+	// 	}
+	// 	d.push(className, b)
+	// }
 
 	fds := d.registry.GetBeanFactoryDefinition(className)
 	for _, fd := range fds {
@@ -110,6 +125,25 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 			return b, err
 		}
 		d.push(className, b)
+	}
+
+	allCreatedBean := d.GetAllResolvedBeans()
+	// determine if any bean implements interface
+	for _, bd := range d.registry.GetAllBeans() {
+		bdsImplement := []beanResolver{}
+		if !bd.IsInterface {
+			continue
+		}
+		for _, rb := range allCreatedBean {
+			if ok, err := astutil.CheckIfTypeImplementsInterfaceWithCache(string(rb.GetDefinitionBase().BeanClass), string(bd.BeanClass)); err == nil && ok {
+				bdsImplement = append(bdsImplement, rb)
+			}
+		}
+		if len(bdsImplement) > 0 {
+			for _, v := range bdsImplement {
+				d.push(string(bd.BeanClass), v)
+			}
+		}
 	}
 
 	if b, err := d.created.Get(className); err == nil && len(b) > 0 {

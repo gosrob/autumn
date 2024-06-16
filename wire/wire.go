@@ -14,17 +14,15 @@ import (
 )
 
 func init() {
+	var1_MoVCG := beandefinition.DefinitionDemo{}
+	var1_OpHZs := subdirectory.C{}
+	var1_zfVJT := *beandefinition.ProduceDefinitionDemo(&var1_OpHZs)
 
-	var1_mMArP := beandefinition.DefinitionDemo{}
-	var1_cDRMq := subdirectory.C{}
-	var1_IFCDv := *beandefinition.ProduceDefinitionDemo(&var1_cDRMq)
+	var1_MoVCG.B = var1_zfVJT
 
-	var1_mMArP.B = var1_IFCDv
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition.DefinitionDemo", var1_MoVCG)
 
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition.DefinitionDemo", var1_mMArP)
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.C", var1_OpHZs)
 
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.C", var1_cDRMq)
-
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.B", var1_IFCDv)
-
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.B", var1_zfVJT)
 }

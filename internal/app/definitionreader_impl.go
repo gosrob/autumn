@@ -46,11 +46,12 @@ func (g *goAnnotationBeanDefinitionReader) ReadBeanDefinition(n any) (BeanDefini
 		return b, err
 	}
 
-	beanClass, isBasicType, dependsOn, isPrimary, isLazy, alias, bean, pkg, err := extractNode(node)
+	beanClass, isBasicType, dependsOn, isPrimary, isLazy, alias, bean, pkg, isInterface, err := extractNode(node)
 	if err != nil {
 		return b, err
 	}
 	b = BeanDefinition{
+		IsInterface: isInterface,
 		DefinitionBase: DefinitionBase{
 			IsBuiltinType: isBasicType,
 			BeanClass:     beanClass,
