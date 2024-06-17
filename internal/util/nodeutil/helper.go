@@ -1,6 +1,9 @@
 package nodeutil
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Type struct {
 	TypeName       string
@@ -53,4 +56,19 @@ func GetShortIdentityByFullPath(tp string) (short string) {
 		short = parts[len(parts)-1]
 	}
 	return short
+}
+
+func GetTypeFromAny(n any) (tp string) {
+	switch v := n.(type) {
+	case int:
+		return "int"
+	case float64:
+		return "float64"
+	case string:
+		return "string"
+	case bool:
+		return "bool"
+	default:
+		return fmt.Sprintf("%T", v)
+	}
 }

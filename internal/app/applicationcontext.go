@@ -125,7 +125,7 @@ func (a *ApplicationContext) CreateZeroBean() error {
 			for _, p := range params {
 				b, err := a.GetBean(p.Type)
 				if err != nil {
-					return &errorcode.BeanNotFindError
+					return errorcode.BeanNotFindError.DeepCopy().Printf(p.Type)
 				}
 
 				callParams = append(callParams, logic.OrGet(p.TypeInfo.IsPointer, "&"+b.GetDecl(), b.GetDecl()))
@@ -155,10 +155,17 @@ func (a *ApplicationContext) Check() error {
 		if len(beans) <= 1 {
 			continue
 		}
+		bds := a.GetBeanDefinition(class)
+		if len(bds) <= 0 {
+			continue
+		}
+		if bds[0].IsInterface {
+			continue
+		}
 		if stream.OfSlice(beans).Filter(func(br beanResolver) bool {
 			return br.GetDefinitionBase().IsPrimary
 		}).Length() != 1 {
-			return &errorcode.BeanPrimaryError
+			return errorcode.BeanPrimaryError.DeepCopy().Printf(class)
 		}
 	}
 
@@ -207,10 +214,6 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 			if len(autowired) <= 0 {
 				continue
 			}
-			rb, err := lbf.GetPrimaryBean(f.Type)
-			if err != nil {
-				return "", errorcode.BeanNotFindError.Instance().Printf("%s", err)
-			}
 
 			isInterface := false
 			bd := br.GetBeanDefinition(f.Type)
@@ -218,6 +221,10 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 				isInterface = true
 			}
 			if !f.TypeInfo.IsArray {
+				rb, err := lbf.GetPrimaryBean(f.Type)
+				if err != nil {
+					return "", errorcode.BeanNotFindError.DeepCopy().APrintf("%s", err).Printf(f.Type)
+				}
 				builder.WriteString(
 					fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
 				)
@@ -238,7 +245,7 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 
 	s, err := wireFunc(bd, wireRb)
 	if err != nil {
-		return "", errorcode.BeanNotFindError.Instance().Printf("%s", err)
+		return "", err
 	}
 
 	return s, nil

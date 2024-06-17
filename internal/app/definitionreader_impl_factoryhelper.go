@@ -21,7 +21,7 @@ func extractFunc(n annotation.Node) (isBuiltinType bool, beanClass string, depen
 
 	funcDecl := n.ASTNode().(*ast.FuncDecl)
 	if len(funcDecl.Type.Results.List) > 1 {
-		err = errorcode.FactoryCanOnlyProduceOneError.Instance().Printf(" produced %d", len(funcDecl.Type.Results.List))
+		err = errorcode.FactoryCanOnlyProduceOneError.DeepCopy().APrintf("produced %d", len(funcDecl.Type.Results.List)).Printf(funcDecl.Name.Name)
 		return
 	}
 	resultsList := funcDecl.Type.Results.List
