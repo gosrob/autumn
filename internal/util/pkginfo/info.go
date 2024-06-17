@@ -9,16 +9,19 @@ import (
 
 type PackageInfo struct {
 	ImportPath string `json:"ImportPath"`
-	Module     struct {
-		Path string `json:"path"`
-		Dir  string `json:"dir"`
-	} `json:"module"`
+	Module     Module `json:"module"`
+}
+type Module struct {
+	Path string `json:"path"`
+	Dir  string `json:"dir"`
 }
 
 func GetFullPackage(fileDir string) PackageInfo {
 	// 执行`go list`命令获取当前文件所在的完整包名称
 	cmd := exec.Command("go", "list", "-e", "-json")
-	cmd.Dir = fileDir
+	if fileDir != "" {
+		cmd.Dir = fileDir
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		log.Fatalf("执行`go list`命令失败: %v", err)

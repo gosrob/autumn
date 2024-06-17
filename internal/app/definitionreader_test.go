@@ -12,7 +12,7 @@ import (
 
 func TestExtractBeanDepends(t *testing.T) {
 	defer logger.Logger.CatchPanic()
-	filePath := "../../testdata/beandefinition/demo.go"
+	filePath := "../../examples/beandefinition/demo.go"
 	src, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		t.Fatalf("Failed to read file: %v", err)

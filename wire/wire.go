@@ -7,24 +7,29 @@
 package wire
 
 import (
+	"github.com/gosrob/autumn/examples/beandefinition"
+	"github.com/gosrob/autumn/examples/beandefinition/subdirectory"
 	"github.com/gosrob/autumn/pkg/container"
-	"github.com/gosrob/autumn/testdata/beandefinition"
-	"github.com/gosrob/autumn/testdata/beandefinition/subdirectory"
 	"github.com/samber/do/v2"
 )
 
 func init() {
+	var1_DiVcz := beandefinition.DefinitionDemo{}
+	var1_NLNdH := beandefinition.Interfacea{}
+	var1_awqwL := subdirectory.C{}
+	var1_jamsq := *beandefinition.ProduceDefinitionDemo(&var1_awqwL)
 
-	var1_yROjw := beandefinition.DefinitionDemo{}
-	var1_pTrGn := subdirectory.C{}
-	var1_BOIxT := *beandefinition.ProduceDefinitionDemo(&var1_pTrGn)
+	var1_DiVcz.B = var1_jamsq
 
-	var1_yROjw.B = var1_BOIxT
+	var1_DiVcz.Inter = append(var1_DiVcz.Inter, &var1_NLNdH)
 
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition.DefinitionDemo", var1_yROjw)
+	var1_DiVcz.Inter = append(var1_DiVcz.Inter, &var1_awqwL)
 
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.C", var1_pTrGn)
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/examples/beandefinition.DefinitionDemo", var1_DiVcz)
 
-	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/testdata/beandefinition/subdirectory.B", var1_BOIxT)
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/examples/beandefinition.Interfacea", var1_NLNdH)
 
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/examples/beandefinition/subdirectory.C", var1_awqwL)
+
+	do.ProvideNamedValue(container.Container, "github.com/gosrob/autumn/examples/beandefinition/subdirectory.B", var1_jamsq)
 }

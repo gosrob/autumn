@@ -73,3 +73,9 @@ var MetaInfoNotDefined Error = Error{
 	Code:  5,
 	inner: nil,
 }
+
+var CannotInjectToArray Error = Error{
+	Msg:   "attributes is not array, but beans is array",
+	Code:  5,
+	inner: nil,
+}

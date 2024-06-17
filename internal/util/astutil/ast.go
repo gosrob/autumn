@@ -53,6 +53,11 @@ func IsBasicType(expr ast.Expr) bool {
 	return false
 }
 
+func IsInterface(expr ast.Expr) bool {
+	_, ok := expr.(*ast.InterfaceType)
+	return ok
+}
+
 // check if an ast.Field is from another package
 func IsAnotherPackage(expr ast.Expr) bool {
 	switch e := expr.(type) {
@@ -108,6 +113,13 @@ func GetFieldPackageAndTypeName(f *ast.Field) (pkg string, name string) {
 	} else if sel, ok := f.Type.(*ast.SelectorExpr); ok {
 		pkg = sel.X.(*ast.Ident).Name
 		name = sel.Sel.Name
+	} else if arrayType, ok := f.Type.(*ast.ArrayType); ok {
+		if ident, ok := arrayType.Elt.(*ast.Ident); ok {
+			name = ident.Name
+		} else if sel, ok := arrayType.Elt.(*ast.SelectorExpr); ok {
+			pkg = sel.X.(*ast.Ident).Name
+			name = sel.Sel.Name
+		}
 	}
 	return
 }

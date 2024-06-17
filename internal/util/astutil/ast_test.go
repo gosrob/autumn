@@ -14,7 +14,7 @@ import (
 func TestParseCommentToAnnotation(t *testing.T) {
 	logger.Logger.SetIsDebug(true)
 	defer logger.Logger.CatchPanic()
-	filePath := "../../../testdata/beandefinition/demo.go"
+	filePath := "../../../examples/beandefinition/demo.go"
 	src, err := os.ReadFile(filePath)
 	if err != nil {
 		t.Fatalf("Failed to read file: %v", err)

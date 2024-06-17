@@ -8,6 +8,7 @@ type Type struct {
 	IsArray        bool
 	IsPointer      bool
 	IsArrayPointer bool
+	IsInterface    bool
 }
 
 func GetType(tp string) Type {

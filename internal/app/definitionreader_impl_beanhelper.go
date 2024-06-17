@@ -16,7 +16,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, dependsOn []string, isPrimary bool, isLazy bool, alias string, bean StructDefinition, pkgInfo Package, err error) {
+func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, dependsOn []string, isPrimary bool, isLazy bool, alias string, bean StructDefinition, pkgInfo Package, isInterface bool, err error) {
 	node := n
 	pkgInfo.FileAbsolutePath = n.Meta().Dir()
 	pkgInfo.CurrentPackage = n.Meta().PackageName()
@@ -27,6 +27,7 @@ func extractNode(n annotation.Node) (beanClass BeanClass, isBasicType bool, depe
 
 	// isBasicType
 	isBasicType = astutil.IsBasicType(typeSpec.Type)
+	isInterface = astutil.IsInterface(typeSpec.Type)
 	// beanClass
 
 	beanClass = BeanClass(astutil.BuildFullpathPackage(nodeutil.GetType(typeSpec.Name.Name).PureType, pkgInfo.CurrentFullPackage))
@@ -86,6 +87,7 @@ func extractField(f *ast.Field, ims []*ast.ImportSpec, currentPkg string) (field
 		field.Name = f.Names[0].Name
 	}
 	field.Type = extractBeanClass(f, ims, currentPkg)
+	field.TypeInfo = nodeutil.GetType(astutil.GetExprType(f.Type))
 
 	cmt, ok := astutil.Comment(f)
 	if ok {
