@@ -138,7 +138,7 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 	}
 
 	if d.init {
-		return nil, errorcode.CreateZeroBeanError.Instance().Printf("need bean class: %s", className)
+		return nil, errorcode.CreateZeroBeanError.DeepCopy().Printf("need bean class: %s", className)
 	}
 	for _, bd := range d.registry.GetAllBeans() {
 		if bd.IsInterface {
@@ -187,7 +187,7 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 		return b[0], nil
 	}
 
-	return nil, errorcode.CreateZeroBeanError.Instance().Printf("need bean class: %s", className)
+	return nil, errorcode.CreateZeroBeanError.DeepCopy().Printf("need bean class: %s", className)
 }
 
 // GetBeans implements ListableBeanFactory.

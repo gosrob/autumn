@@ -1,35 +1,73 @@
 package errorcode
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
+// Error structure
 type Error struct {
 	Msg   string
 	Code  int64
 	inner error
 }
 
-// Error implements error.
-func (e *Error) Error() string {
-	if _, ok := e.inner.(*Error); ok && e.inner != nil {
-		return e.inner.Error()
+// Constructor for Error
+func NewError(msg string, code int64, inner error) *Error {
+	return &Error{
+		Msg:   msg,
+		Code:  code,
+		inner: inner,
 	}
-	return fmt.Sprintf("%s \n -----> inner error: %s", e.Msg, e.inner)
 }
 
-func (e *Error) Instance() *Error {
-	ins := Error{
+// Error implements error interface
+func (e *Error) Error() string {
+	if e.inner == nil {
+		return fmt.Sprintf("Error Code: %d, Message: %s", e.Code, e.Msg)
+	}
+
+	var innerErrorStrings []string
+	for inner := e.inner; inner != nil; {
+		if innerErr, ok := inner.(*Error); ok && innerErr != nil {
+			innerErrorStrings = append(innerErrorStrings, fmt.Sprintf("Caused by: Code: %d, Message: %s", innerErr.Code, innerErr.Msg))
+			inner = innerErr.inner
+		} else {
+			innerErrorStrings = append(innerErrorStrings, fmt.Sprintf("Caused by: %s", inner.Error()))
+			break
+		}
+	}
+
+	remainingInnerErrors := strings.Join(innerErrorStrings, "\n    ")
+	return fmt.Sprintf("Error Code: %d, Message: %s\n    %s", e.Code, e.Msg, remainingInnerErrors)
+}
+
+// DeepCopy creates a deep copy of the error instance
+func (e *Error) DeepCopy() *Error {
+	var copiedInner error
+	if e.inner != nil {
+		inner, ok := e.inner.(*Error)
+		if ok {
+			copiedInner = inner.DeepCopy()
+		} else {
+			copiedInner = e.inner // non-Error inner error, not copying
+		}
+	}
+
+	return &Error{
 		Msg:   e.Msg,
 		Code:  e.Code,
-		inner: e.inner,
+		inner: copiedInner,
 	}
-	return &ins
 }
 
+// Printf adds formatted message to the error
 func (e *Error) Printf(format string, params ...any) *Error {
-	e.Msg += fmt.Sprintf(" : "+format, params)
-	return e
+	newMsg := fmt.Sprintf(format, params...)
+	return NewError(fmt.Sprintf("%s: %s", e.Msg, newMsg), e.Code, e.inner)
 }
 
+// Variable to verify that Error implements the error interface
 var _ error = (*Error)(nil)
 
 var CastError Error = Error{

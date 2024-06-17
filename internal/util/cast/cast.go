@@ -8,5 +8,5 @@ func Cast[T any](node any) (T, error) {
 		return v, nil
 	}
 
-	return zero, errorcode.CastError.Instance()
+	return zero, errorcode.CastError.DeepCopy()
 }

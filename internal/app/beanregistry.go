@@ -78,7 +78,7 @@ func (b *beanRegistry) ResolveAlias() error {
 			}
 
 			if _, ok := b.beans[alias]; ok {
-				return errorcode.DepulicatedBeanAliasError.Instance().Printf("%s has set", alias)
+				return errorcode.DepulicatedBeanAliasError.DeepCopy().Printf("%s has set", alias)
 			}
 			b.beans[alias] = append(b.beans[alias], v)
 		}
@@ -94,7 +94,7 @@ func (b *beanRegistry) ResolveAlias() error {
 			}
 
 			if _, ok := b.beansFactory[alias]; ok {
-				return errorcode.DepulicatedBeanAliasError.Instance().Printf("%s has set", alias)
+				return errorcode.DepulicatedBeanAliasError.DeepCopy().Printf("%s has set", alias)
 			}
 			b.beansFactory[alias] = append(b.beansFactory[alias], v)
 		}

@@ -16,7 +16,7 @@ func AstCast[T any](node ast.Node) (T, error) {
 		return v, nil
 	}
 
-	return zero, errorcode.CastError.Instance().Printf("cannot cast to ast type")
+	return zero, errorcode.CastError.DeepCopy().Printf("cannot cast to ast type")
 }
 
 func IsBasicType(expr ast.Expr) bool {

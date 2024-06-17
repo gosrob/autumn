@@ -209,7 +209,7 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 			}
 			rb, err := lbf.GetPrimaryBean(f.Type)
 			if err != nil {
-				return "", errorcode.BeanNotFindError.Instance().Printf("%s", err)
+				return "", errorcode.BeanNotFindError.DeepCopy().Printf("%s", err)
 			}
 
 			isInterface := false
@@ -238,7 +238,7 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 
 	s, err := wireFunc(bd, wireRb)
 	if err != nil {
-		return "", errorcode.BeanNotFindError.Instance().Printf("%s", err)
+		return "", errorcode.BeanNotFindError.DeepCopy().Printf("%s", err)
 	}
 
 	return s, nil
