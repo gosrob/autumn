@@ -6,6 +6,7 @@ import (
 
 	annotation "github.com/YReshetko/go-annotation/pkg"
 	"github.com/gosrob/autumn/internal/errorcode"
+	"github.com/gosrob/autumn/internal/util/nodeutil"
 	"github.com/gosrob/autumn/internal/util/parser"
 	"github.com/gosrob/autumn/internal/util/stream"
 )
@@ -16,7 +17,7 @@ func AstCast[T any](node ast.Node) (T, error) {
 		return v, nil
 	}
 
-	return zero, errorcode.CastError.DeepCopy().Printf("cannot cast to ast type")
+	return zero, errorcode.CastError.DeepCopy().APrintf("cannot cast to ast type").Printf(nodeutil.GetTypeFromAny(node), nodeutil.GetTypeFromAny(zero))
 }
 
 func IsBasicType(expr ast.Expr) bool {

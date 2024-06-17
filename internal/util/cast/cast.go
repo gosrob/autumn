@@ -1,6 +1,9 @@
 package cast
 
-import "github.com/gosrob/autumn/internal/errorcode"
+import (
+	"github.com/gosrob/autumn/internal/errorcode"
+	"github.com/gosrob/autumn/internal/util/nodeutil"
+)
 
 func Cast[T any](node any) (T, error) {
 	var zero T
@@ -8,5 +11,5 @@ func Cast[T any](node any) (T, error) {
 		return v, nil
 	}
 
-	return zero, errorcode.CastError.DeepCopy()
+	return zero, errorcode.CastError.DeepCopy().Printf(nodeutil.GetTypeFromAny(node), nodeutil.GetTypeFromAny(zero))
 }

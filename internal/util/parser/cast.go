@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/gosrob/autumn/internal/errorcode"
+	"github.com/gosrob/autumn/internal/util/nodeutil"
 	"github.com/gosrob/autumn/internal/util/stream"
 )
 
@@ -17,7 +18,7 @@ func Cast[T any](a Annotation) (T, error) {
 			return t, nil
 		}
 	}
-	return t, &errorcode.CastError
+	return t, errorcode.CastError.DeepCopy().Printf(nodeutil.GetTypeFromAny(a), nodeutil.GetTypeFromAny(t))
 }
 
 func mapToStruct[T any](m any, dst *T) error {

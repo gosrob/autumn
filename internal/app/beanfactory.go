@@ -45,7 +45,7 @@ func (d *DefaultBeanFactoryer) GetPrimaryBean(className string, params ...string
 		rbs = stream.OfSlice(rbs).Filter(func(br beanResolver) bool { return br.GetDefinitionBase().IsPrimary }).ToSlice()
 	}
 	if len(rbs) != 1 {
-		return nil, &errorcode.BeanPrimaryError
+		return nil, errorcode.BeanPrimaryError.DeepCopy().Printf(className)
 	}
 	return rbs[0], nil
 }
@@ -138,7 +138,7 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 	}
 
 	if d.init {
-		return nil, errorcode.CreateZeroBeanError.DeepCopy().Printf("need bean class: %s", className)
+		return nil, errorcode.CreateZeroBeanError.DeepCopy().APrintf("need bean class: %s", className).Printf(className)
 	}
 	for _, bd := range d.registry.GetAllBeans() {
 		if bd.IsInterface {
@@ -187,7 +187,7 @@ func (d *DefaultBeanFactoryer) GetBean(className string, params ...string) (bean
 		return b[0], nil
 	}
 
-	return nil, errorcode.CreateZeroBeanError.DeepCopy().Printf("need bean class: %s", className)
+	return nil, errorcode.CreateZeroBeanError.DeepCopy().APrintf("need bean class: %s", className).Printf(className)
 }
 
 // GetBeans implements ListableBeanFactory.
@@ -203,7 +203,7 @@ func (d *DefaultBeanFactoryer) GetBeans(className string) ([]beanResolver, error
 		return b, nil
 	}
 
-	return nil, &errorcode.CreateZeroBeanError
+	return nil, errorcode.CreateZeroBeanError.DeepCopy().Printf(className)
 }
 
 var (
