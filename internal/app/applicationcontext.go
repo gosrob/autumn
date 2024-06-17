@@ -32,14 +32,14 @@ func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) 
 	// TODO: begin to create bean with zero value(if not has factory func), if has factory func, then initialize it with factory func, and push to resolvedRegistry
 	err = a.CreateZeroBean()
 	if err != nil {
-		logger.Logger.Fatalf("create bean fail %s", err)
+		logger.Logger.Warnf("create bean fail %s", err)
 		return nil
 	}
 
 	// TODO: before inject attributes, check attributes, if one attributes has gt 1 beans && these beans do not have primary flag set, then FatalLog this error
 	err = a.Check()
 	if err != nil {
-		logger.Logger.Fatalf("check beans error %s", err)
+		logger.Logger.Warnf("check beans error %s", err)
 		return nil
 	}
 
@@ -52,7 +52,7 @@ func (a *ApplicationContext) Run(ctx context.Context) (files map[string][]byte) 
 	a.WriteCreateBean()
 	err = a.Wire()
 	if err != nil {
-		logger.Logger.Fatalf("%s", err)
+		logger.Logger.Warnf("%s", err)
 		return nil
 	}
 
