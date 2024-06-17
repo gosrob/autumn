@@ -121,6 +121,13 @@ func GetFieldPackageAndTypeName(f *ast.Field) (pkg string, name string) {
 			pkg = sel.X.(*ast.Ident).Name
 			name = sel.Sel.Name
 		}
+	} else if starExpr, ok := f.Type.(*ast.StarExpr); ok {
+		if ident, ok := starExpr.X.(*ast.Ident); ok {
+			name = ident.Name
+		} else if sel, ok := starExpr.X.(*ast.SelectorExpr); ok {
+			pkg = sel.X.(*ast.Ident).Name
+			name = sel.Sel.Name
+		}
 	}
 	return
 }

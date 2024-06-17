@@ -1,6 +1,10 @@
 package subdirectory
 
-type B struct{}
+// @Bean(isPrimary="true")
+type B struct {
+	// @Autowired
+	Cc *C
+}
 
 // @Bean(isPrimary="true", isLazy="false")
 type C struct{}

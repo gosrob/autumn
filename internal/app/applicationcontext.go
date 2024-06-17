@@ -226,7 +226,7 @@ func wireAttribute(bd BeanDefinition, lbf ListableBeanFactory, br BeanRegistryer
 					return "", errorcode.BeanNotFindError.DeepCopy().APrintf("%s", err).Printf(f.Type)
 				}
 				builder.WriteString(
-					fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface, "&"+rb.GetDecl(), rb.GetDecl())),
+					fmt.Sprintf(wireTempl, rbi.GetDecl(), f.Name, logic.OrGet(isInterface || f.TypeInfo.IsPointer, "&"+rb.GetDecl(), rb.GetDecl())),
 				)
 			} else {
 				rbs, _ := lbf.GetBeans(f.Type)
